@@ -4,6 +4,7 @@ import com.dovelol.demo.mybatis.entity.User;
 import com.dovelol.demo.mybatis.mapper.UserMapper;
 import org.apache.ibatis.builder.StaticSqlSource;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
+import org.apache.ibatis.jdbc.SQL;
 import org.apache.ibatis.mapping.*;
 import org.apache.ibatis.scripting.defaults.RawSqlSource;
 import org.apache.ibatis.session.Configuration;
@@ -28,7 +29,7 @@ public class ConfigDemo {
 
     public static void main(String[] args) {
         //DataSource dataSource = BlogDataSourceFactory.getBlogDataSource();
-        DataSource dataSource = new PooledDataSource("com.mysql.jdbc.Driver","jdbc:mysql://localhost:3306/demo","root","");
+        DataSource dataSource = new PooledDataSource("com.mysql.jdbc.Driver","jdbc:mysql://localhost:3306/demo?useSSL=false","root","");
         TransactionFactory transactionFactory = new JdbcTransactionFactory();
         Environment environment = new Environment("dev", transactionFactory, dataSource);
         Configuration configuration = new Configuration(environment);
@@ -39,6 +40,7 @@ public class ConfigDemo {
         resultMappings.add(parameterMapping);
         ResultMapping parameterMapping1 = new ResultMapping.Builder(configuration,"name","name",String.class).build();
         resultMappings.add(parameterMapping1);
+
 
         RawSqlSource staticSqlSource = new RawSqlSource(configuration, "select * from user where id = #{id}", Long.class);
 

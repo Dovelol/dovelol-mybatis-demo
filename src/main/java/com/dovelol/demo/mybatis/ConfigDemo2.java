@@ -2,7 +2,10 @@ package com.dovelol.demo.mybatis;
 
 import com.dovelol.demo.mybatis.entity.User;
 import com.dovelol.demo.mybatis.mapper.UserMapper;
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
+import org.apache.ibatis.logging.log4j2.Log4j2Impl;
+import org.apache.ibatis.logging.stdout.StdOutImpl;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ResultMap;
@@ -16,6 +19,7 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 
 import javax.sql.DataSource;
+import java.beans.PropertyVetoException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,14 +32,13 @@ import static org.apache.ibatis.mapping.SqlCommandType.SELECT;
 public class ConfigDemo2 {
 
 
-    public static void main(String[] args) {
-        //DataSource dataSource = BlogDataSourceFactory.getBlogDataSource();
-        DataSource dataSource = new PooledDataSource("com.mysql.jdbc.Driver","jdbc:mysql://localhost:3306/demo","root","");
+    public static void main(String[] args) throws PropertyVetoException {
+        DataSource dataSource = new PooledDataSource("com.mysql.jdbc.Driver","jdbc:mysql://localhost:3306/demo?useSSL=false","root","");
         TransactionFactory transactionFactory = new JdbcTransactionFactory();
         Environment environment = new Environment("dev", transactionFactory, dataSource);
         Configuration configuration = new Configuration(environment);
         configuration.addMapper(UserMapper.class);
-
+        configuration.setLogImpl(Log4j2Impl.class);
 //        List<ResultMapping> resultMappings = new ArrayList<>();
 //        ResultMapping parameterMapping = new ResultMapping.Builder(configuration,"id","id",Long.class).build();
 //        resultMappings.add(parameterMapping);
@@ -54,9 +57,11 @@ public class ConfigDemo2 {
 
         SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(configuration);
         try (SqlSession session = sqlSessionFactory.openSession()) {
-            UserMapper mapper = session.getMapper(UserMapper.class);
-            User user = mapper.getUserById(101L);
-            System.out.println(user);
+        for(int i = 0; i < 20; i++){
+                UserMapper mapper = session.getMapper(UserMapper.class);
+                User user = mapper.getUserById(101L);
+                System.out.println(user);
+            }
         }
     }
 
